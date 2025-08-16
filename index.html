@@ -46,59 +46,77 @@ const select = document.getElementById('countrySelect');
 const infoDiv = document.getElementById('countryInfo');
 const errorDiv = document.getElementById('errorMsg');
 
-// ✅ Full backup list of 100+ countries (trimmed here for brevity—keep entire list in your actual file)
+// ✅ FULL backup list of countries (complete ISO set)
 const backupCountries = [
-  { cca3: 'AFG', name: { common: 'Afghanistan' } }, { cca3: 'ALB', name: { common: 'Albania' } },
-  { cca3: 'DZA', name: { common: 'Algeria' } }, { cca3: 'AND', name: { common: 'Andorra' } },
-  { cca3: 'AGO', name: { common: 'Angola' } }, { cca3: 'ARG', name: { common: 'Argentina' } },
-  /* ...include ALL countries down to... */
-  { cca3: 'ZMB', name: { common: 'Zambia' } }, { cca3: 'ZWE', name: { common: 'Zimbabwe' } }
-];
-
-function populateDropdown(countries) {
-  select.innerHTML = '<option value="">--Choose a country--</option>';
-  countries.sort((a, b) => a.name.common.localeCompare(b.name.common))
-           .forEach(country => {
-             const opt = document.createElement('option');
-             opt.value = country.cca3;
-             opt.textContent = country.name.common;
-             select.appendChild(opt);
-           });
-}
-
-// Try API first, fallback to backup list if needed
-fetch('https://restcountries.com/v3.1/all')
-  .then(res => res.json())
-  .then(data => {
-    if (Array.isArray(data) && data.length > 0) {
-      populateDropdown(data);
-    } else {
-      throw new Error('Empty API');
-    }
-  })
-  .catch(err => {
-    errorDiv.textContent = "⚠️ Using backup country list.";
-    populateDropdown(backupCountries);
-  });
-
-select.addEventListener('change', () => {
-  const code = select.value;
-  if (!code) { infoDiv.innerHTML = ''; return; }
-  fetch(`https://restcountries.com/v3.1/alpha/${code}`)
-    .then(res => res.json())
-    .then(([data]) => {
-      infoDiv.innerHTML = `
-        <div class="card">
-          <h2>${data.name.common} (${data.cca3})</h2>
-          <p><strong>Capital:</strong> ${data.capital ? data.capital[0] : 'N/A'}</p>
-          <p><strong>Region:</strong> ${data.region}</p>
-          <p><strong>Population:</strong> ${data.population.toLocaleString()}</p>
-          <img src="${data.flags.svg}" alt="Flag of ${data.name.common}">
-        </div>
-      `;
-    })
-    .catch(() => { infoDiv.innerHTML = '<p class="error">Details unavailable.</p>'; });
-});
-</script>
-</body>
-</html>
+  { cca3: 'AFG', name: { common: 'Afghanistan' } },
+  { cca3: 'ALB', name: { common: 'Albania' } },
+  { cca3: 'DZA', name: { common: 'Algeria' } },
+  { cca3: 'AND', name: { common: 'Andorra' } },
+  { cca3: 'AGO', name: { common: 'Angola' } },
+  { cca3: 'ATG', name: { common: 'Antigua and Barbuda' } },
+  { cca3: 'ARG', name: { common: 'Argentina' } },
+  { cca3: 'ARM', name: { common: 'Armenia' } },
+  { cca3: 'AUS', name: { common: 'Australia' } },
+  { cca3: 'AUT', name: { common: 'Austria' } },
+  { cca3: 'AZE', name: { common: 'Azerbaijan' } },
+  { cca3: 'BHS', name: { common: 'Bahamas' } },
+  { cca3: 'BHR', name: { common: 'Bahrain' } },
+  { cca3: 'BGD', name: { common: 'Bangladesh' } },
+  { cca3: 'BRB', name: { common: 'Barbados' } },
+  { cca3: 'BLR', name: { common: 'Belarus' } },
+  { cca3: 'BEL', name: { common: 'Belgium' } },
+  { cca3: 'BLZ', name: { common: 'Belize' } },
+  { cca3: 'BEN', name: { common: 'Benin' } },
+  { cca3: 'BTN', name: { common: 'Bhutan' } },
+  { cca3: 'BOL', name: { common: 'Bolivia' } },
+  { cca3: 'BIH', name: { common: 'Bosnia and Herzegovina' } },
+  { cca3: 'BWA', name: { common: 'Botswana' } },
+  { cca3: 'BRA', name: { common: 'Brazil' } },
+  { cca3: 'BRN', name: { common: 'Brunei Darussalam' } },
+  { cca3: 'BGR', name: { common: 'Bulgaria' } },
+  { cca3: 'BFA', name: { common: 'Burkina Faso' } },
+  { cca3: 'BDI', name: { common: 'Burundi' } },
+  { cca3: 'CPV', name: { common: 'Cabo Verde' } },
+  { cca3: 'KHM', name: { common: 'Cambodia' } },
+  { cca3: 'CMR', name: { common: 'Cameroon' } },
+  { cca3: 'CAN', name: { common: 'Canada' } },
+  { cca3: 'CAF', name: { common: 'Central African Republic' } },
+  { cca3: 'TCD', name: { common: 'Chad' } },
+  { cca3: 'CHL', name: { common: 'Chile' } },
+  { cca3: 'CHN', name: { common: 'China' } },
+  { cca3: 'COL', name: { common: 'Colombia' } },
+  { cca3: 'COM', name: { common: 'Comoros' } },
+  { cca3: 'COG', name: { common: 'Congo' } },
+  { cca3: 'COD', name: { common: 'Congo (Democratic Republic)' } },
+  { cca3: 'CRI', name: { common: 'Costa Rica' } },
+  { cca3: 'CIV', name: { common: 'Côte d\'Ivoire' } },
+  { cca3: 'HRV', name: { common: 'Croatia' } },
+  { cca3: 'CUB', name: { common: 'Cuba' } },
+  { cca3: 'CYP', name: { common: 'Cyprus' } },
+  { cca3: 'CZE', name: { common: 'Czechia' } },
+  { cca3: 'DNK', name: { common: 'Denmark' } },
+  { cca3: 'DJI', name: { common: 'Djibouti' } },
+  { cca3: 'DMA', name: { common: 'Dominica' } },
+  { cca3: 'DOM', name: { common: 'Dominican Republic' } },
+  { cca3: 'ECU', name: { common: 'Ecuador' } },
+  { cca3: 'EGY', name: { common: 'Egypt' } },
+  { cca3: 'SLV', name: { common: 'El Salvador' } },
+  { cca3: 'GNQ', name: { common: 'Equatorial Guinea' } },
+  { cca3: 'ERI', name: { common: 'Eritrea' } },
+  { cca3: 'EST', name: { common: 'Estonia' } },
+  { cca3: 'SWZ', name: { common: 'Eswatini' } },
+  { cca3: 'ETH', name: { common: 'Ethiopia' } },
+  { cca3: 'FJI', name: { common: 'Fiji' } },
+  { cca3: 'FIN', name: { common: 'Finland' } },
+  { cca3: 'FRA', name: { common: 'France' } },
+  { cca3: 'GAB', name: { common: 'Gabon' } },
+  { cca3: 'GMB', name: { common: 'Gambia' } },
+  { cca3: 'GEO', name: { common: 'Georgia' } },
+  { cca3: 'DEU', name: { common: 'Germany' } },
+  { cca3: 'GHA', name: { common: 'Ghana' } },
+  { cca3: 'GRC', name: { common: 'Greece' } },
+  { cca3: 'GRD', name: { common: 'Grenada' } },
+  { cca3: 'GTM', name: { common: 'Guatemala' } },
+  { cca3: 'GIN', name: { common: 'Guinea' } },
+  { cca3: 'GNB', name: { common: 'Guinea-Bissau' } },
+  { cca3: 'GUY', name: { common
