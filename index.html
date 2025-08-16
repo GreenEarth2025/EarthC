@@ -24,7 +24,6 @@
     padding: 1rem; margin-top: 1rem;
   }
   img { max-width: 200px; margin-top: 1rem; border: 1px solid #fff; }
-  .error { color: #ff6666; font-weight: bold; margin-top: 1rem; }
 </style>
 </head>
 <body>
@@ -38,15 +37,13 @@
     <option value="">--Choose a country--</option>
   </select>
   <div id="countryInfo"></div>
-  <div id="errorMsg" class="error"></div>
 </main>
 
 <script>
 const select = document.getElementById('countrySelect');
 const infoDiv = document.getElementById('countryInfo');
-const errorDiv = document.getElementById('errorMsg');
 
-// ✅ FULL backup list of countries (complete ISO set)
+// Full static backup list
 const backupCountries = [
   { cca3: 'AFG', name: { common: 'Afghanistan' } },
   { cca3: 'ALB', name: { common: 'Albania' } },
@@ -119,4 +116,7 @@ const backupCountries = [
   { cca3: 'GTM', name: { common: 'Guatemala' } },
   { cca3: 'GIN', name: { common: 'Guinea' } },
   { cca3: 'GNB', name: { common: 'Guinea-Bissau' } },
-  { cca3: 'GUY', name: { common
+  { cca3: 'GUY', name: { common: 'Guyana' } },
+  { cca3: 'HTI', name: { common: 'Haiti' } },
+  { cca3: 'HND', name: { common: 'Honduras' } },
+  { cca3: 'HUN', name: { common:
