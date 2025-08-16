@@ -39,6 +39,11 @@
       display: block;
       margin-top: 1rem;
     }
+    .error {
+      color: red;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
   </style>
 </head>
 <body>
@@ -52,47 +57,15 @@
       <option value="">--Choose a country--</option>
     </select>
     <div id="countryInfo"></div>
+    <div id="errorMsg" class="error"></div>
   </main>
 
   <script>
     const select = document.getElementById('countrySelect');
     const infoDiv = document.getElementById('countryInfo');
+    const errorDiv = document.getElementById('errorMsg');
 
     async function loadCountries() {
-      const res = await fetch('https://restcountries.com/v3.1/all');
-      const countries = await res.json();
-      countries.sort((a,b) => a.name.common.localeCompare(b.name.common));
-      countries.forEach(country => {
-        const opt = document.createElement('option');
-        opt.value = country.cca3;
-        opt.textContent = country.name.common;
-        select.appendChild(opt);
-      });
-    }
-
-    async function showCountry(code) {
-      if (!code) {
-        infoDiv.innerHTML = '';
-        return;
-      }
-      const res = await fetch(`https://restcountries.com/v3.1/alpha/${code}`);
-      const [data] = await res.json();
-      infoDiv.innerHTML = `
-        <div class="card">
-          <h2>${data.name.common} (${data.cca3})</h2>
-          <p><strong>Capital:</strong> ${data.capital ? data.capital[0] : 'N/A'}</p>
-          <p><strong>Population:</strong> ${data.population.toLocaleString()}</p>
-          <p><strong>Region:</strong> ${data.region}</p>
-          <p><strong>Subregion:</strong> ${data.subregion || 'N/A'}</p>
-          <p><strong>Area:</strong> ${data.area.toLocaleString()} km²</p>
-          <img src="${data.flags.svg}" alt="Flag of ${data.name.common}">
-        </div>
-      `;
-    }
-
-    select.addEventListener('change', e => showCountry(e.target.value));
-
-    loadCountries();
-  </script>
-</body>
-</html>
+      try {
+        const res = await fetch('https://restcountries.com/v3.1/all');
+        if (!res.ok) throw new Error
