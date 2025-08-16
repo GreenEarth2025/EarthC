@@ -1,53 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Country Insights Explorer</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 1rem; }
-    label { font-weight: bold; display: block; margin-top: 1rem; }
-    select { padding: 0.5rem; font-size: 1rem; width: 100%; max-width: 400px; }
-  </style>
-</head>
-<body>
-  <h1>Country Insights Explorer</h1>
-  <p>Select a country to view key facts</p>
+document.getElementById('country').addEventListener('change', function () {
+  const selected = this.value;
+  const details = countryData[selected]; // assuming countryData is your preloaded object
+  const panel = document.getElementById('details');
 
-  <label for="countrySelect">Country:</label>
-  <select id="countrySelect">
-    <option value="">--Choose a country--</option>
-  </select>
-
-  <script>
-    const select = document.getElementById('countrySelect');
-
-    const backupCountries = [
-      { cca3: "AFG", name: { common: "Afghanistan" } },
-      { cca3: "ALB", name: { common: "Albania" } },
-      { cca3: "DZA", name: { common: "Algeria" } },
-      { cca3: "AND", name: { common: "Andorra" } },
-      { cca3: "AGO", name: { common: "Angola" } },
-      { cca3: "ATG", name: { common: "Antigua and Barbuda" } },
-      { cca3: "ARG", name: { common: "Argentina" } },
-      { cca3: "ARM", name: { common: "Armenia" } },
-      { cca3: "AUS", name: { common: "Australia" } },
-      { cca3: "AUT", name: { common: "Austria" } }
-      // …continue with the full ~250 entries down to Zimbabwe
-    ];
-
-    function populateDropdown(countries) {
-      countries
-        .sort((a, b) => a.name.common.localeCompare(b.name.common))
-        .forEach(country => {
-          const opt = document.createElement('option');
-          opt.value = country.cca3;
-          opt.textContent = country.name.common;
-          select.appendChild(opt);
-        });
-    }
-
-    populateDropdown(backupCountries);
-  </script>
-</body>
-</html>
+  if (details) {
+    panel.innerHTML = `
+      <h2>${selected}</h2>
+      <p><strong>Capital:</strong> ${details.capital}</p>
+      <p><strong>Population:</strong> ${details.population.toLocaleString()}</p>
+      <p><strong>Region:</strong> ${details.region}</p>
+    `;
+  } else {
+    panel.innerHTML = `<p>Please select a country.</p>`;
+  }
+});
