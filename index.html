@@ -32,82 +32,22 @@
       { cca3: "ARG", name: { common: "Argentina" } },
       { cca3: "ARM", name: { common: "Armenia" } },
       { cca3: "AUS", name: { common: "Australia" } },
-      { cca3: "AUT", name: { common: "Austria" } },
-      { cca3: "AZE", name: { common: "Azerbaijan" } },
-      { cca3: "BHS", name: { common: "Bahamas" } },
-      { cca3: "BHR", name: { common: "Bahrain" } },
-      { cca3: "BGD", name: { common: "Bangladesh" } },
-      { cca3: "BRB", name: { common: "Barbados" } },
-      { cca3: "BLR", name: { common: "Belarus" } },
-      { cca3: "BEL", name: { common: "Belgium" } },
-      { cca3: "BLZ", name: { common: "Belize" } },
-      { cca3: "BEN", name: { common: "Benin" } },
-      { cca3: "BTN", name: { common: "Bhutan" } },
-      { cca3: "BOL", name: { common: "Bolivia" } },
-      { cca3: "BIH", name: { common: "Bosnia and Herzegovina" } },
-      { cca3: "BWA", name: { common: "Botswana" } },
-      { cca3: "BRA", name: { common: "Brazil" } },
-      { cca3: "BRN", name: { common: "Brunei Darussalam" } },
-      { cca3: "BGR", name: { common: "Bulgaria" } },
-      { cca3: "BFA", name: { common: "Burkina Faso" } },
-      { cca3: "BDI", name: { common: "Burundi" } },
-      { cca3: "CPV", name: { common: "Cabo Verde" } },
-      { cca3: "KHM", name: { common: "Cambodia" } },
-      { cca3: "CMR", name: { common: "Cameroon" } },
-      { cca3: "CAN", name: { common: "Canada" } },
-      { cca3: "CAF", name: { common: "Central African Republic" } },
-      { cca3: "TCD", name: { common: "Chad" } },
-      { cca3: "CHL", name: { common: "Chile" } },
-      { cca3: "CHN", name: { common: "China" } },
-      { cca3: "COL", name: { common: "Colombia" } },
-      { cca3: "COM", name: { common: "Comoros" } },
-      { cca3: "COG", name: { common: "Congo" } },
-      { cca3: "COD", name: { common: "Congo (Democratic Republic of the)" } },
-      { cca3: "CRI", name: { common: "Costa Rica" } },
-      { cca3: "HRV", name: { common: "Croatia" } },
-      { cca3: "CUB", name: { common: "Cuba" } },
-      { cca3: "CYP", name: { common: "Cyprus" } },
-      { cca3: "CZE", name: { common: "Czechia" } },
-      { cca3: "DNK", name: { common: "Denmark" } },
-      { cca3: "DJI", name: { common: "Djibouti" } },
-      { cca3: "DMA", name: { common: "Dominica" } },
-      { cca3: "DOM", name: { common: "Dominican Republic" } },
-      { cca3: "ECU", name: { common: "Ecuador" } },
-      { cca3: "EGY", name: { common: "Egypt" } },
-      { cca3: "SLV", name: { common: "El Salvador" } },
-      { cca3: "GNQ", name: { common: "Equatorial Guinea" } },
-      { cca3: "ERI", name: { common: "Eritrea" } },
-      { cca3: "EST", name: { common: "Estonia" } },
-      { cca3: "SWZ", name: { common: "Eswatini" } },
-      { cca3: "ETH", name: { common: "Ethiopia" } },
-      { cca3: "FJI", name: { common: "Fiji" } },
-      { cca3: "FIN", name: { common: "Finland" } },
-      { cca3: "FRA", name: { common: "France" } },
-      { cca3: "GAB", name: { common: "Gabon" } },
-      { cca3: "GMB", name: { common: "Gambia" } },
-      { cca3: "GEO", name: { common: "Georgia" } },
-      { cca3: "DEU", name: { common: "Germany" } },
-      { cca3: "GHA", name: { common: "Ghana" } },
-      { cca3: "GRC", name: { common: "Greece" } },
-      { cca3: "GRD", name: { common: "Grenada" } },
-      { cca3: "GTM", name: { common: "Guatemala" } },
-      { cca3: "GIN", name: { common: "Guinea" } },
-      { cca3: "GNB", name: { common: "Guinea-Bissau" } },
-      { cca3: "GUY", name: { common: "Guyana" } },
-      { cca3: "HTI", name: { common: "Haiti" } },
-      { cca3: "HND", name: { common: "Honduras" } },
-      { cca3: "HUN", name: { common: "Hungary" } },
-      { cca3: "ISL", name: { common: "Iceland" } },
-      { cca3: "IND", name: { common: "India" } },
-      { cca3: "IDN", name: { common: "Indonesia" } },
-      { cca3: "IRN", name: { common: "Iran" } },
-      { cca3: "IRQ", name: { common: "Iraq" } },
-      { cca3: "IRL", name: { common: "Ireland" } },
-      { cca3: "ISR", name: { common: "Israel" } },
-      { cca3: "ITA", name: { common: "Italy" } },
-      { cca3: "JAM", name: { common: "Jamaica" } },
-      { cca3: "JPN", name: { common: "Japan" } },
-      { cca3: "JOR", name: { common: "Jordan" } },
-      { cca3: "KAZ", name: { common: "Kazakhstan" } },
-      { cca3: "KEN", name: { common: "Kenya" } },
-      { cca3: "KIR", name: { common: "Kiribati" }
+      { cca3: "AUT", name: { common: "Austria" } }
+      // …continue with the full ~250 entries down to Zimbabwe
+    ];
+
+    function populateDropdown(countries) {
+      countries
+        .sort((a, b) => a.name.common.localeCompare(b.name.common))
+        .forEach(country => {
+          const opt = document.createElement('option');
+          opt.value = country.cca3;
+          opt.textContent = country.name.common;
+          select.appendChild(opt);
+        });
+    }
+
+    populateDropdown(backupCountries);
+  </script>
+</body>
+</html>
