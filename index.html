@@ -1,22 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Country Insights Explorer</title>
 <style>
   body {
-    font-family: Arial, sans-serif;
     margin: 0;
+    font-family: Arial, sans-serif;
     background: #1a1a1a url('https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/World_map_-_low_resolution.svg/2000px-World_map_-_low_resolution.svg.png') no-repeat center center fixed;
     background-size: cover;
     color: #f0f0f0;
   }
   header {
     background: rgba(0, 119, 182, 0.85);
-    color: white;
-    padding: 1rem;
     text-align: center;
+    padding: 1rem;
   }
   main {
     max-width: 900px;
@@ -26,22 +25,23 @@
     border-radius: 8px;
   }
   label {
+    display: block;
+    margin-top: 1rem;
     font-weight: bold;
   }
   select {
+    width: 100%;
     padding: 0.5rem;
     font-size: 1rem;
-    margin: 0.5rem 0 1rem 0;
-    width: 100%;
-    border-radius: 4px;
+    margin-top: 0.5rem;
     border: none;
+    border-radius: 4px;
   }
   .card {
     background: rgba(255,255,255,0.1);
     border-radius: 8px;
     padding: 1rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    margin-top: 1rem;
   }
   img {
     max-width: 200px;
@@ -51,8 +51,8 @@
   }
   .error {
     color: #ff6666;
-    font-weight: bold;
     margin-top: 1rem;
+    font-weight: bold;
   }
 </style>
 </head>
@@ -75,7 +75,7 @@ const select = document.getElementById('countrySelect');
 const infoDiv = document.getElementById('countryInfo');
 const errorDiv = document.getElementById('errorMsg');
 
-// Backup list of 100+ countries (ISO alpha-3 + name)
+// ✅ Backup list of over 100 countries
 const backupCountries = [
   { cca3: 'AFG', name: { common: 'Afghanistan' } },
   { cca3: 'ALB', name: { common: 'Albania' } },
@@ -107,14 +107,9 @@ const backupCountries = [
   { cca3: 'KHM', name: { common: 'Cambodia' } },
   { cca3: 'CMR', name: { common: 'Cameroon' } },
   { cca3: 'CAN', name: { common: 'Canada' } },
-  { cca3: 'CPV', name: { common: 'Cape Verde' } },
-  { cca3: 'CAF', name: { common: 'Central African Republic' } },
-  { cca3: 'TCD', name: { common: 'Chad' } },
   { cca3: 'CHL', name: { common: 'Chile' } },
   { cca3: 'CHN', name: { common: 'China' } },
   { cca3: 'COL', name: { common: 'Colombia' } },
-  { cca3: 'COM', name: { common: 'Comoros' } },
-  { cca3: 'COG', name: { common: 'Congo' } },
   { cca3: 'CRI', name: { common: 'Costa Rica' } },
   { cca3: 'HRV', name: { common: 'Croatia' } },
   { cca3: 'CUB', name: { common: 'Cuba' } },
@@ -127,10 +122,7 @@ const backupCountries = [
   { cca3: 'ECU', name: { common: 'Ecuador' } },
   { cca3: 'EGY', name: { common: 'Egypt' } },
   { cca3: 'SLV', name: { common: 'El Salvador' } },
-  { cca3: 'GNQ', name: { common: 'Equatorial Guinea' } },
-  { cca3: 'ERI', name: { common: 'Eritrea' } },
   { cca3: 'EST', name: { common: 'Estonia' } },
-  { cca3: 'SWZ', name: { common: 'Eswatini' } },
   { cca3: 'ETH', name: { common: 'Ethiopia' } },
   { cca3: 'FJI', name: { common: 'Fiji' } },
   { cca3: 'FIN', name: { common: 'Finland' } },
@@ -144,4 +136,14 @@ const backupCountries = [
   { cca3: 'GRD', name: { common: 'Grenada' } },
   { cca3: 'GTM', name: { common: 'Guatemala' } },
   { cca3: 'GIN', name: { common: 'Guinea' } },
-  { cca3: 'GNB', name: { common: 'Guinea-Bissau'
+  { cca3: 'GNB', name: { common: 'Guinea-Bissau' } },
+  { cca3: 'GUY', name: { common: 'Guyana' } },
+  { cca3: 'HTI', name: { common: 'Haiti' } },
+  { cca3: 'HND', name: { common: 'Honduras' } },
+  { cca3: 'HUN', name: { common: 'Hungary' } },
+  { cca3: 'ISL', name: { common: 'Iceland' } },
+  { cca3: 'IND', name: { common: 'India' } },
+  { cca3: 'IDN', name: { common: 'Indonesia' } },
+  { cca3: 'IRN', name: { common: 'Iran' } },
+  { cca3: 'IRQ', name: { common: 'Iraq' } },
+  { cca3: 'IRL
