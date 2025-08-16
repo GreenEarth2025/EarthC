@@ -8,11 +8,12 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      background: #f0f4f8;
-      color: #333;
+      background: #1a1a1a url('https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/World_map_-_low_resolution.svg/2000px-World_map_-_low_resolution.svg.png') no-repeat center center fixed;
+      background-size: cover;
+      color: #f0f0f0;
     }
     header {
-      background: #0077b6;
+      background: rgba(0, 119, 182, 0.85);
       color: white;
       padding: 1rem;
       text-align: center;
@@ -21,26 +22,35 @@
       max-width: 900px;
       margin: auto;
       padding: 1rem;
+      background: rgba(0,0,0,0.6);
+      border-radius: 8px;
+    }
+    label {
+      font-weight: bold;
     }
     select {
       padding: 0.5rem;
       font-size: 1rem;
-      margin-bottom: 1rem;
+      margin: 0.5rem 0 1rem 0;
+      width: 100%;
+      border-radius: 4px;
+      border: none;
     }
     .card {
-      background: white;
+      background: rgba(255,255,255,0.1);
       border-radius: 8px;
       padding: 1rem;
       margin-bottom: 1rem;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.5);
     }
     img {
       max-width: 200px;
       display: block;
       margin-top: 1rem;
+      border: 1px solid #fff;
     }
     .error {
-      color: red;
+      color: #ff6666;
       font-weight: bold;
       margin-top: 1rem;
     }
@@ -68,4 +78,62 @@
     async function loadCountries() {
       try {
         const res = await fetch('https://restcountries.com/v3.1/all');
-        if (!res.ok) throw new Error
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+        const countries = await res.json();
+        populateDropdown(countries);
+      } catch (err) {
+        console.error('Error fetching countries:', err);
+        errorDiv.textContent = '⚠ Unable to load country list from API. Showing backup list.';
+        const fallback = [
+          { cca3: 'AUS', name: { common: 'Australia' } },
+          { cca3: 'IND', name: { common: 'India' } },
+          { cca3: 'USA', name: { common: 'United States' } },
+          { cca3: 'GBR', name: { common: 'United Kingdom' } },
+          { cca3: 'CAN', name: { common: 'Canada' } }
+        ];
+        populateDropdown(fallback);
+      }
+    }
+
+    function populateDropdown(countries) {
+      countries.sort((a,b) => a.name.common.localeCompare(b.name.common));
+      countries.forEach(country => {
+        const opt = document.createElement('option');
+        opt.value = country.cca3;
+        opt.textContent = country.name.common;
+        select.appendChild(opt);
+      });
+    }
+
+    async function showCountry(code) {
+      if (!code) {
+        infoDiv.innerHTML = '';
+        return;
+      }
+      try {
+        const res = await fetch(`https://restcountries.com/v3.1/alpha/${code}`);
+        if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+        const [data] = await res.json();
+        infoDiv.innerHTML = `
+          <div class="card">
+            <h2>${data.name.common} (${data.cca3})</h2>
+            <p><strong>Capital:</strong> ${data.capital ? data.capital[0] : 'N/A'}</p>
+            <p><strong>Population:</strong> ${data.population.toLocaleString()}</p>
+            <p><strong>Region:</strong> ${data.region}</p>
+            <p><strong>Subregion:</strong> ${data.subregion || 'N/A'}</p>
+            <p><strong>Area:</strong> ${data.area.toLocaleString()} km²</p>
+            <img src="${data.flags.svg}" alt="Flag of ${data.name.common}">
+          </div>
+        `;
+      } catch (err) {
+        console.error('Error fetching country details:', err);
+        errorDiv.textContent = '⚠ Unable to load country details. Please try again later.';
+      }
+    }
+
+    select.addEventListener('change', e => showCountry(e.target.value));
+
+    loadCountries();
+  </script>
+</body>
+</html>
