@@ -1,16 +1,459 @@
-document.getElementById('country').addEventListener('change', function () {
-  const selected = this.value;
-  const details = countryData[selected]; // assuming countryData is your preloaded object
-  const panel = document.getElementById('details');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Country Flags Selector (Offline)</title>
+  <style>
+    :root {
+      --bg: #0b1220;
+      --card: #101a33;
+      --text: #e8eefc;
+      --muted: #9db0d1;
+      --accent: #4da3ff;
+      --border: #1e2a47;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: radial-gradient(1200px 600px at 10% -10%, #1b2b52, transparent 60%) no-repeat, var(--bg);
+      color: var(--text);
+      font: 15px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .app {
+      width: min(900px, 100%);
+      background: color-mix(in oklab, var(--card) 90%, transparent);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03);
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 6px 18px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    header h1 {
+      font-size: 18px;
+      margin: 0;
+      letter-spacing: .2px;
+    }
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .row {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 720px) {
+      .row { grid-template-columns: 1fr; }
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      letter-spacing: .3px;
+      text-transform: uppercase;
+    }
+    select, input[type="text"] {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #0c1730;
+      color: var(--text);
+      outline: none;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    select:focus, input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(77,163,255,.15);
+    }
+    .panel {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 16px;
+      align-items: center;
+      padding: 16px;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(255,255,255,.02), transparent);
+    }
+    @media (max-width: 720px) {
+      .panel { grid-template-columns: 1fr; text-align: center; }
+    }
+    .flag {
+      font-size: 100px;
+      line-height: 1;
+      filter: drop-shadow(0 6px 16px rgba(0,0,0,.35));
+    }
+    .meta {
+      display: grid;
+      gap: 6px;
+    }
+    .meta div {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 10px;
+      align-items: baseline;
+    }
+    .key {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .3px;
+    }
+    .val {
+      font-size: 16px;
+    }
+    .hint {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .muted { color: var(--muted); }
+    .spacer { height: 6px; }
+  </style>
+</head>
+<body>
+  <main class="app" role="main">
+    <header>
+      <div>
+        <h1>Country flags selector (offline)</h1>
+        <p>Choose a country to see its flag. All data is embedded locally; no internet required.</p>
+      </div>
+      <div class="muted">v1.0</div>
+    </header>
 
-  if (details) {
-    panel.innerHTML = `
-      <h2>${selected}</h2>
-      <p><strong>Capital:</strong> ${details.capital}</p>
-      <p><strong>Population:</strong> ${details.population.toLocaleString()}</p>
-      <p><strong>Region:</strong> ${details.region}</p>
-    `;
-  } else {
-    panel.innerHTML = `<p>Please select a country.</p>`;
-  }
-});
+    <section class="controls" aria-labelledby="controls-heading">
+      <div class="row">
+        <div>
+          <label for="search">Search</label>
+          <input id="search" type="text" placeholder="Type to filter countries…" autocomplete="off" />
+        </div>
+        <div>
+          <label for="country">Country</label>
+          <select id="country" size="10" aria-describedby="country-help"></select>
+          <div id="country-help" class="hint">Arrow keys navigate. Press Enter to select.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-live="polite">
+      <div id="flag" class="flag" aria-label="Flag">🏳️</div>
+      <div class="meta">
+        <div><span class="key">Country</span><span class="val" id="name">—</span></div>
+        <div><span class="key">ISO code</span><span class="val" id="code">—</span></div>
+        <div class="hint">Flags are rendered with emoji. On some systems, appearance may vary slightly.</div>
+      </div>
+    </section>
+    <div class="spacer"></div>
+  </main>
+
+  <script>
+    // Convert ISO 3166-1 alpha-2 code (e.g., "AU") to a flag emoji.
+    function codeToFlagEmoji(code) {
+      if (!code) return "";
+      return code
+        .toUpperCase()
+        .replace(/[^A-Z]/g, "")
+        .split("")
+        .map(c => String.fromCodePoint(0x1F1E6 + (c.charCodeAt(0) - 65)))
+        .join("");
+    }
+
+    // Minimal fuzzy filter: matches if all query letters appear in order in the name.
+    function fuzzyMatch(name, query) {
+      if (!query) return true;
+      let i = 0;
+      const q = query.toLowerCase();
+      const n = name.toLowerCase();
+      for (let ch of n) {
+        if (ch === q[i]) i++;
+        if (i === q.length) return true;
+      }
+      return false;
+    }
+
+    // ISO country list (UN members + widely used codes), name + alpha-2 code.
+    // Source context: common ISO 3166-1 set (embedded locally).
+    const COUNTRIES = [
+      { name: "Afghanistan", code: "AF" },
+      { name: "Albania", code: "AL" },
+      { name: "Algeria", code: "DZ" },
+      { name: "Andorra", code: "AD" },
+      { name: "Angola", code: "AO" },
+      { name: "Antigua and Barbuda", code: "AG" },
+      { name: "Argentina", code: "AR" },
+      { name: "Armenia", code: "AM" },
+      { name: "Australia", code: "AU" },
+      { name: "Austria", code: "AT" },
+      { name: "Azerbaijan", code: "AZ" },
+      { name: "Bahamas", code: "BS" },
+      { name: "Bahrain", code: "BH" },
+      { name: "Bangladesh", code: "BD" },
+      { name: "Barbados", code: "BB" },
+      { name: "Belarus", code: "BY" },
+      { name: "Belgium", code: "BE" },
+      { name: "Belize", code: "BZ" },
+      { name: "Benin", code: "BJ" },
+      { name: "Bhutan", code: "BT" },
+      { name: "Bolivia", code: "BO" },
+      { name: "Bosnia and Herzegovina", code: "BA" },
+      { name: "Botswana", code: "BW" },
+      { name: "Brazil", code: "BR" },
+      { name: "Brunei", code: "BN" },
+      { name: "Bulgaria", code: "BG" },
+      { name: "Burkina Faso", code: "BF" },
+      { name: "Burundi", code: "BI" },
+      { name: "Cabo Verde", code: "CV" },
+      { name: "Cambodia", code: "KH" },
+      { name: "Cameroon", code: "CM" },
+      { name: "Canada", code: "CA" },
+      { name: "Central African Republic", code: "CF" },
+      { name: "Chad", code: "TD" },
+      { name: "Chile", code: "CL" },
+      { name: "China", code: "CN" },
+      { name: "Colombia", code: "CO" },
+      { name: "Comoros", code: "KM" },
+      { name: "Congo", code: "CG" },
+      { name: "Congo, Democratic Republic of the", code: "CD" },
+      { name: "Costa Rica", code: "CR" },
+      { name: "Cote d’Ivoire", code: "CI" },
+      { name: "Croatia", code: "HR" },
+      { name: "Cuba", code: "CU" },
+      { name: "Cyprus", code: "CY" },
+      { name: "Czechia", code: "CZ" },
+      { name: "Denmark", code: "DK" },
+      { name: "Djibouti", code: "DJ" },
+      { name: "Dominica", code: "DM" },
+      { name: "Dominican Republic", code: "DO" },
+      { name: "Ecuador", code: "EC" },
+      { name: "Egypt", code: "EG" },
+      { name: "El Salvador", code: "SV" },
+      { name: "Equatorial Guinea", code: "GQ" },
+      { name: "Eritrea", code: "ER" },
+      { name: "Estonia", code: "EE" },
+      { name: "Eswatini", code: "SZ" },
+      { name: "Ethiopia", code: "ET" },
+      { name: "Fiji", code: "FJ" },
+      { name: "Finland", code: "FI" },
+      { name: "France", code: "FR" },
+      { name: "Gabon", code: "GA" },
+      { name: "Gambia", code: "GM" },
+      { name: "Georgia", code: "GE" },
+      { name: "Germany", code: "DE" },
+      { name: "Ghana", code: "GH" },
+      { name: "Greece", code: "GR" },
+      { name: "Grenada", code: "GD" },
+      { name: "Guatemala", code: "GT" },
+      { name: "Guinea", code: "GN" },
+      { name: "Guinea-Bissau", code: "GW" },
+      { name: "Guyana", code: "GY" },
+      { name: "Haiti", code: "HT" },
+      { name: "Honduras", code: "HN" },
+      { name: "Hungary", code: "HU" },
+      { name: "Iceland", code: "IS" },
+      { name: "India", code: "IN" },
+      { name: "Indonesia", code: "ID" },
+      { name: "Iran", code: "IR" },
+      { name: "Iraq", code: "IQ" },
+      { name: "Ireland", code: "IE" },
+      { name: "Israel", code: "IL" },
+      { name: "Italy", code: "IT" },
+      { name: "Jamaica", code: "JM" },
+      { name: "Japan", code: "JP" },
+      { name: "Jordan", code: "JO" },
+      { name: "Kazakhstan", code: "KZ" },
+      { name: "Kenya", code: "KE" },
+      { name: "Kiribati", code: "KI" },
+      { name: "Korea, North", code: "KP" },
+      { name: "Korea, South", code: "KR" },
+      { name: "Kuwait", code: "KW" },
+      { name: "Kyrgyzstan", code: "KG" },
+      { name: "Laos", code: "LA" },
+      { name: "Latvia", code: "LV" },
+      { name: "Lebanon", code: "LB" },
+      { name: "Lesotho", code: "LS" },
+      { name: "Liberia", code: "LR" },
+      { name: "Libya", code: "LY" },
+      { name: "Liechtenstein", code: "LI" },
+      { name: "Lithuania", code: "LT" },
+      { name: "Luxembourg", code: "LU" },
+      { name: "Madagascar", code: "MG" },
+      { name: "Malawi", code: "MW" },
+      { name: "Malaysia", code: "MY" },
+      { name: "Maldives", code: "MV" },
+      { name: "Mali", code: "ML" },
+      { name: "Malta", code: "MT" },
+      { name: "Marshall Islands", code: "MH" },
+      { name: "Mauritania", code: "MR" },
+      { name: "Mauritius", code: "MU" },
+      { name: "Mexico", code: "MX" },
+      { name: "Micronesia", code: "FM" },
+      { name: "Moldova", code: "MD" },
+      { name: "Monaco", code: "MC" },
+      { name: "Mongolia", code: "MN" },
+      { name: "Montenegro", code: "ME" },
+      { name: "Morocco", code: "MA" },
+      { name: "Mozambique", code: "MZ" },
+      { name: "Myanmar", code: "MM" },
+      { name: "Namibia", code: "NA" },
+      { name: "Nauru", code: "NR" },
+      { name: "Nepal", code: "NP" },
+      { name: "Netherlands", code: "NL" },
+      { name: "New Zealand", code: "NZ" },
+      { name: "Nicaragua", code: "NI" },
+      { name: "Niger", code: "NE" },
+      { name: "Nigeria", code: "NG" },
+      { name: "North Macedonia", code: "MK" },
+      { name: "Norway", code: "NO" },
+      { name: "Oman", code: "OM" },
+      { name: "Pakistan", code: "PK" },
+      { name: "Palau", code: "PW" },
+      { name: "Panama", code: "PA" },
+      { name: "Papua New Guinea", code: "PG" },
+      { name: "Paraguay", code: "PY" },
+      { name: "Peru", code: "PE" },
+      { name: "Philippines", code: "PH" },
+      { name: "Poland", code: "PL" },
+      { name: "Portugal", code: "PT" },
+      { name: "Qatar", code: "QA" },
+      { name: "Romania", code: "RO" },
+      { name: "Russia", code: "RU" },
+      { name: "Rwanda", code: "RW" },
+      { name: "Saint Kitts and Nevis", code: "KN" },
+      { name: "Saint Lucia", code: "LC" },
+      { name: "Saint Vincent and the Grenadines", code: "VC" },
+      { name: "Samoa", code: "WS" },
+      { name: "San Marino", code: "SM" },
+      { name: "Sao Tome and Principe", code: "ST" },
+      { name: "Saudi Arabia", code: "SA" },
+      { name: "Senegal", code: "SN" },
+      { name: "Serbia", code: "RS" },
+      { name: "Seychelles", code: "SC" },
+      { name: "Sierra Leone", code: "SL" },
+      { name: "Singapore", code: "SG" },
+      { name: "Slovakia", code: "SK" },
+      { name: "Slovenia", code: "SI" },
+      { name: "Solomon Islands", code: "SB" },
+      { name: "Somalia", code: "SO" },
+      { name: "South Africa", code: "ZA" },
+      { name: "South Sudan", code: "SS" },
+      { name: "Spain", code: "ES" },
+      { name: "Sri Lanka", code: "LK" },
+      { name: "Sudan", code: "SD" },
+      { name: "Suriname", code: "SR" },
+      { name: "Sweden", code: "SE" },
+      { name: "Switzerland", code: "CH" },
+      { name: "Syria", code: "SY" },
+      { name: "Tajikistan", code: "TJ" },
+      { name: "Tanzania", code: "TZ" },
+      { name: "Thailand", code: "TH" },
+      { name: "Timor-Leste", code: "TL" },
+      { name: "Togo", code: "TG" },
+      { name: "Tonga", code: "TO" },
+      { name: "Trinidad and Tobago", code: "TT" },
+      { name: "Tunisia", code: "TN" },
+      { name: "Turkey", code: "TR" },
+      { name: "Turkmenistan", code: "TM" },
+      { name: "Tuvalu", code: "TV" },
+      { name: "Uganda", code: "UG" },
+      { name: "Ukraine", code: "UA" },
+      { name: "United Arab Emirates", code: "AE" },
+      { name: "United Kingdom", code: "GB" },
+      { name: "United States", code: "US" },
+      { name: "Uruguay", code: "UY" },
+      { name: "Uzbekistan", code: "UZ" },
+      { name: "Vanuatu", code: "VU" },
+      { name: "Vatican City", code: "VA" },
+      { name: "Venezuela", code: "VE" },
+      { name: "Vietnam", code: "VN" },
+      { name: "Yemen", code: "YE" },
+      { name: "Zambia", code: "ZM" },
+      { name: "Zimbabwe", code: "ZW" }
+    ];
+
+    // DOM elements
+    const selectEl = document.getElementById("country");
+    const searchEl = document.getElementById("search");
+    const flagEl = document.getElementById("flag");
+    const nameEl = document.getElementById("name");
+    const codeEl = document.getElementById("code");
+
+    // State
+    let filtered = [...COUNTRIES];
+
+    function renderOptions(list) {
+      selectEl.innerHTML = "";
+      for (const c of list) {
+        const opt = document.createElement("option");
+        opt.value = c.code;
+        opt.textContent = `${c.name}  ${codeToFlagEmoji(c.code)}`;
+        selectEl.appendChild(opt);
+      }
+      if (list.length) {
+        selectEl.selectedIndex = 0;
+        updatePanel(list[0]);
+      } else {
+        flagEl.textContent = "🏳️";
+        nameEl.textContent = "No matches";
+        codeEl.textContent = "—";
+      }
+    }
+
+    function updatePanel(country) {
+      const flag = codeToFlagEmoji(country.code);
+      flagEl.textContent = flag || "🏳️";
+      nameEl.textContent = country.name;
+      codeEl.textContent = country.code;
+      // Keep the selected option in sync
+      const idx = filtered.findIndex(c => c.code === country.code);
+      if (idx >= 0) selectEl.selectedIndex = idx;
+    }
+
+    // Initial render
+    renderOptions(filtered);
+
+    // Events
+    searchEl.addEventListener("input", () => {
+      const q = searchEl.value.trim();
+      filtered = COUNTRIES.filter(c => fuzzyMatch(c.name, q));
+      renderOptions(filtered);
+    });
+
+    selectEl.addEventListener("change", () => {
+      const code = selectEl.value;
+      const country = filtered.find(c => c.code === code);
+      if (country) updatePanel(country);
+    });
+
+    // Keyboard: Enter selects in the listbox
+    selectEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const code = selectEl.value;
+        const country = filtered.find(c => c.code === code);
+        if (country) updatePanel(country);
+      }
+    });
+  </script>
+</body>
+</html>
